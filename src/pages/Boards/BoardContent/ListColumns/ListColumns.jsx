@@ -4,7 +4,7 @@ import Button from '@mui/material/Button'
 import NoteAddIcon from '@mui/icons-material/NoteAdd'
 
 
-function ListColumns() {
+function ListColumns({ columns }) {
   return (
     <Box sx={{
       bgcolor: 'inherit',
@@ -15,9 +15,11 @@ function ListColumns() {
       overflowY: 'hidden',
       '&::-webkit-scrollbar-track': { m: 2 }
     }}>
-      {/* Box Column */}
-      <Column />
-      <Column />
+      {/* Box Column
+      map 1 arrow function khi chi co 1 tham so thi khong can ngoac tron (column)
+       su dung ngoac tron la no tu return*/}
+      {columns?.map( column => <Column key={column._id} column={column} /> )}
+
 
       {/* Box Add new column  */}
       <Box sx={{
