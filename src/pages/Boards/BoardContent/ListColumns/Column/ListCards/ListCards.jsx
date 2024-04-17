@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import Card from './Card/Card'
 
-function ListCards({cards}) {
+function ListCards({ cards }) {
   return (
     <Box sx={{
       p: '0 5px',
