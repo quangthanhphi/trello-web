@@ -19,7 +19,7 @@ export const mockData = {
             boardId: 'board-id-01',
             columnId: 'column-id-01',
             title: 'Title of card 01',
-            description: 'Markdown Syntax (sẽ ở khóa nâng cao nhé)',
+            description: 'Markdown Syntax ',
             cover: 'https://img.freepik.com/free-photo/flowing-purple-mountain-spiral-bright-imagination-generated-by-ai_188544-9853.jpg',
             memberIds: ['test-user-id-01'],
             comments: ['test comment 01', 'test comment 02'],
