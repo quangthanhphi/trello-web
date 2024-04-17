@@ -28,7 +28,7 @@ function Templates() {
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
-        endIcon={ <ExpandMoreIcon /> }
+        endIcon={<ExpandMoreIcon />}
       >
         Templates
       </Button>
@@ -41,7 +41,7 @@ function Templates() {
           'aria-labelledby': 'basic-button-templates'
         }}
       >
-       <MenuItem>
+        <MenuItem>
           <ListItemText inset>Single</ListItemText>
         </MenuItem>
         <MenuItem>

@@ -10,7 +10,7 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import { Tooltip } from '@mui/material'
 import Button from '@mui/material/Button'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import {capitalizeFirstLetter} from '~/utils/formatters'
+import { capitalizeFirstLetter } from '~/utils/formatters'
 
 const MENU_STYLES = {
   color: 'white',
@@ -26,7 +26,7 @@ const MENU_STYLES = {
   }
 }
 
-function BoardBar({board}) {
+function BoardBar({ board }) {
   return (
     <Box
       sx={{
@@ -75,8 +75,8 @@ function BoardBar({board}) {
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Button 
-          variant="outlined" 
+        <Button
+          variant="outlined"
           startIcon={<PersonAddIcon />}
           sx={{
             color: 'white',

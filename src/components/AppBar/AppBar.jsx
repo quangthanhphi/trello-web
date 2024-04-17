@@ -52,12 +52,12 @@ function AppBar() {
           <Starred />
           <Templates />
           <Button
-            sx={{ 
+            sx={{
               color: 'white',
               border: 'none',
               '&:hover': { border : 'none' }
             }}
-            variant="outlined" 
+            variant="outlined"
             startIcon={<LibraryAddIcon />}
           >
             Create
@@ -67,7 +67,7 @@ function AppBar() {
       </Box>
 
       <Box sx = {{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <TextField 
+        <TextField
           id="outlined-search"
           label="Search..."
           type="text"
@@ -88,7 +88,7 @@ function AppBar() {
               />
             )
           }}
-          sx={{ 
+          sx={{
             minWidth: '120px',
             maxWidth: '170px',
             '& label': { color: 'white' },
@@ -105,7 +105,7 @@ function AppBar() {
 
         <Tooltip title="Notification">
           <Badge color="warning" variant="dot" sx={{ cursor: 'pointer' }}>
-            <NotificationsNoneIcon sx={{color: 'white'}} />
+            <NotificationsNoneIcon sx={{ color: 'white' }} />
           </Badge>
         </Tooltip>
 
