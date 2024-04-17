@@ -13,6 +13,7 @@ import {
 } from '@dnd-kit/core'
 import { useEffect, useState } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
+import { cloneDeep } from 'lodash'
 
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
@@ -47,6 +48,13 @@ function BoardContent({ board }) {
     setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
   }, [board])
 
+  //Tim column theo card id
+  const findColumnByCardId = (cardId) => {
+    //nen dung c.cards thay vi c.cardOrderIds boi vi o buoc handleDragOver se lam du lieu
+    // cho cards hoan chinh truoc roi moi tao ra cardOrderIds moi
+    return orderedColumns.find(column => column?.cards?.map(card => card._id)?.includes(cardId))
+  }
+
   //Trigger khi bat dau keo(drag) 1 phan tu
   const handleDragStart = (event) => {
     // console.log('handleDragStart::', event)
@@ -55,13 +63,86 @@ function BoardContent({ board }) {
     setActiveDragItemData(event?.active?.data?.current)
   }
 
+  //Trigger trong qua trinh keo 1 phan tu
+  const handleDragOver = (event) => {
+    //Khong lam gi them neu dang keo column
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) return
+
+    // console.log('handleDragOver::', event)
+    //Neu keo card thi xu li them keo card qua lai giua cac column
+    const { active, over } = event
+
+    //Can dam bao neu khong ton tai active hoac over (khi keo ra khoi pham vi container) thi khong lam gi (tranh crash)
+    if (!active || !over) return
+
+    //activeDraggingCard: La card dang duoc keo
+    const { id: activeDraggingCardId, data: { current: activeDraggingCardData } } = active
+    //OverCard: la card dang tuong tac tren hoac duoi so voi card dang duoc keo o tren
+    const { id: overCardId } = over
+
+    //Tim 2 cai column theo card id
+    const activeColumn = findColumnByCardId(activeDraggingCardId)
+    const overColumn = findColumnByCardId(overCardId)
+
+    //Neu khong ton tai 1 trong 2 column thi khong lam gi, tranh crash
+    if ( !activeColumn || !overColumn ) return
+
+    //Xu li khi keo card qua 2 column khac nhau, con neu keo card trong 1 column thi khong lam gi
+    //O day chi xu li keo (handleDragOver)
+    if (activeColumn._id !== overColumn._id ) {
+      setOrderedColumns(prevColumns => {
+        //Tim vi tri cua overCard trong column dich(noi activeCard sap duoc tha)
+        const overCardIndex = overColumn?.cards?.findIndex(card => card._id === overCardId)
+
+        //logic tinh toan "cardIndex moi" (tren hoac duoi cua overCard) lay chuan ra tu code cua thu vien 
+        let newCardIndex
+        const isBelowOverItem = active.rect.current.translated &&
+        active.rect.current.translated.top > over.rect.top + over.rect.height
+
+        const modifier = isBelowOverItem ? 1 : 0
+        newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
+
+        //Clone mang OrderColumnsState cu ra mot cai moi de xu ly data roi return - cap nhat lai OrderedColumnsState moi
+        const nextColumns = cloneDeep(prevColumns)
+        const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
+        const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
+
+        //Column cu~
+        if (nextActiveColumn) {
+          //xoa Card o column active (cung co the hieu la column cu~, luc ma keo card ra khoi no de sang column khac)
+          nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
+
+          //cap nhat lai mang cardOrderIds cho chuan du lieu
+          nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
+        }
+
+        //Column moi
+        if (nextOverColumn) {
+          //Kiem tra card dang keo co ton tai o overColumn chua, neu co thi xoa truoc
+          nextOverColumn.cards = nextOverColumn.cards.filter(card => card._id !== activeDraggingCardId)
+
+          //tiep theo la them card dang keo vao overColumn theo vi tri index moi
+          nextOverColumn.cards = nextOverColumn.cards.toSpliced(newCardIndex, 0, activeDraggingCardData)
+
+          //cap nhat lai mang cardOrderIds cho chuan du lieu
+          nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
+        }
+        return nextColumns
+      })
+    }
+  }
+
   //Trigger khi ket thuc hanh dong keo(drag) 1 phan tu => hanh dong tha(drop)
   const handleDragEnd = (event) => {
+
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) {
+      return
+    }
     // console.log('handleDragEnd::', event)
     const { active, over } = event
 
-    //Kiem tra neu khong ton tai over( keo linh tinh ra ngoai thi return luon tranh loi)
-    if (!over) return
+    //Can dam bao neu khong ton tai active hoac over (khi keo ra khoi pham vi container) thi khong lam gi (tranh crash)
+    if (!active || !over) return
 
     //Neu vi tri sau khi keo tha khac vi tri ban dau
     if (active.id !== over.id) {
@@ -92,6 +173,7 @@ function BoardContent({ board }) {
     <DndContext
       sensors={sensors}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <Box sx={{

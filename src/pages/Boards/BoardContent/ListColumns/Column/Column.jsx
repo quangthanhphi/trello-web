@@ -44,7 +44,7 @@ function Column( { column } ) {
   const handleClose = () => { setAnchorEl(null) }
   const orderedCards = mapOrder(column?.cards, column?.cardOrderIds, '_id' )
 
-  //Phai co div vi van de chieu cao cua column khi keo tha se co bug flickering 
+  //Phai co div vi van de chieu cao cua column khi keo tha se co bug flickering
   return (
     <div ref={ setNodeRef } style={ dndKitColumnStyles } {...attributes} >
       <Box
