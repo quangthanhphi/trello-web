@@ -7,11 +7,11 @@ import { useEffect, useState } from 'react'
 import { fetchBoardDetailsAPI } from '~/apis'
 
 function Board() {
-  const [ board, setBoard ] = useState(null)
+  const [board, setBoard] = useState(null)
 
   useEffect(() => {
     // Tạm thời fix cứng boardId, chuẩn là sử dụng react-router-dom để lấy chuẩn boardId từ URL về
-    const boardId = '662902e9f5d5663a6d032140'
+    const boardId = '662a347347f6336c0fbc0327'
     //Call API
     fetchBoardDetailsAPI(boardId).then( (board) => {
       setBoard(board)
