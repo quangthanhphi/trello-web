@@ -9,19 +9,27 @@ import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 
 
-function ListColumns({ columns }) {
+function ListColumns({ columns, createNewColumn, createNewCard }) {
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
   const [newColumnTitle, setNewColumnTitle] = useState('')
 
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if (!newColumnTitle) {
       toast.error('Please enter Column Title!')
       return
     }
 
-    // Gọi API ở đây ...
+    // Tạo dữ liệu Column để gọi API
+    const newColumnData = {
+      title: newColumnTitle
+    }
+
+    /**
+     * Gọi lên props function createNewColumn nằm ở component cha cao nhất (boards/_id.jsx)
+     */
+    await createNewColumn(newColumnData)
 
     // Đóng trạng thái thêm Column và clear input
     toggleOpenNewColumnForm()
@@ -43,7 +51,7 @@ function ListColumns({ columns }) {
         {/* Box Column
         map 1 arrow function khi chi co 1 tham so thi khong can ngoac tron (column)
         su dung ngoac tron la no tu return*/}
-        {columns?.map(column => <Column key={column._id} column={column} />)}
+        {columns?.map(column => <Column key={column._id} column={column} createNewCard= {createNewCard} />)}
 
 
         {/* Box Add new column  */}
