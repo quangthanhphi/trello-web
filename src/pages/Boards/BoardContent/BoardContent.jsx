@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
-import { mapOrder } from '~/utils/sorts'
 import {
   DndContext,
   // PointerSensor,
@@ -30,7 +29,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard }) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn }) {
   // https://docs.dndkit.com/api-documentation/sensors#usesensor
   // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
 
@@ -56,7 +55,8 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
   const lastOverId = useRef(null)
 
   useEffect(() => {
-    setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
+    // Column đã được sắp xếp ở component cha cao nhất (board/_id.jsx)
+    setOrderedColumns(board.columns)
   }, [board])
 
   //Tim column theo card id
@@ -225,12 +225,15 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
 
         //Lay vi tri cu (cua thang oldColumnWhenDraggingCard)
         const oldCardIndex = oldColumnWhenDraggingCard?.cards?.findIndex(c => c._id === activeDragItemId)
+
         //Lay vi tri moi (cua thang overColumn)
         const newCardIndex = overColumn?.cards?.findIndex(c => c._id === overCardId)
 
         //Dùng arrayMove vì kéo card trong 1 column tương tự với logic kéo column trong boardContent
         const dndOrderedCards = arrayMove(oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex)
+        const dndOrderedCardsIds = dndOrderedCards.map(card => card._id)
 
+        // Vẫn gọi update state ở đây để tránh delay hoặc Flickering giao diện lúc kéo thả cần phải chờ gọi API
         setOrderedColumns(prevColumns => {
           //Clone mang OrderColumnsState cu ra mot cai moi de xu ly data roi return - cap nhat lai OrderedColumnsState moi
           const nextColumns = cloneDeep(prevColumns)
@@ -240,11 +243,13 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
 
           //cập nhật lại 2 giá trị mới là card và cardOrderIds trong cái targetColumn
           targetColumn.cards = dndOrderedCards
-          targetColumn.cardOrderIds = dndOrderedCards.map(card => card._id)
+          targetColumn.cardOrderIds = dndOrderedCardsIds
 
           //Trả về giá trị state mới (chuẩn vị trí)
           return nextColumns
         })
+        // Gọi lên props function moveCardInTheSameColumn() nằm ở component cha cao nhất ( boards/_id.jsx)
+        moveCardInTheSameColumn(dndOrderedCards, dndOrderedCardsIds, oldColumnWhenDraggingCard._id)
       }
 
     }
@@ -263,7 +268,13 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
         // const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id)
         // console.log('dndOrderedColumns: ', dndOrderedColumns)
         // console.log('dndOrderedColumnsIds: ', dndOrderedColumnsIds)
+
+        // Vẫn gọi update state ở đây để tránh delay hoặc Flickering giao diện lúc kéo thả cần phải chờ gọi API
         setOrderedColumns(dndOrderedColumns)
+
+        // Gọi lên props function moveColumns nằm ở component cha cao nhất ( boards/_id.jsx)
+        moveColumns(dndOrderedColumns)
+
       }
     }
 
@@ -309,7 +320,7 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
       const checkColumn = orderedColumns.find(column => column._id === overId)
       if (checkColumn) {
         //console.log('overId before: ', overId)
-        overId = closestCorners ({
+        overId = closestCorners({
           ...args,
           droppableContainers: args.droppableContainers.filter(container => {
             return (container.id !== overId) && (checkColumn?.cardOrderIds?.includes(container.id))
