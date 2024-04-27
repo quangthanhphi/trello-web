@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 
 
-function ListColumns({ columns, createNewColumn, createNewCard }) {
+function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDetails }) {
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
@@ -51,7 +51,12 @@ function ListColumns({ columns, createNewColumn, createNewCard }) {
         {/* Box Column
         map 1 arrow function khi chi co 1 tham so thi khong can ngoac tron (column)
         su dung ngoac tron la no tu return*/}
-        {columns?.map(column => <Column key={column._id} column={column} createNewCard= {createNewCard} />)}
+        {columns?.map(column => <Column
+          key={column._id}
+          column={column}
+          createNewCard={createNewCard}
+          deleteColumnDetails={deleteColumnDetails}
+        />)}
 
 
         {/* Box Add new column  */}
@@ -108,7 +113,7 @@ function ListColumns({ columns, createNewColumn, createNewCard }) {
                 }
 
               }} />
-            <Box sx={{ display: 'flex', alignItems:'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Button
                 onClick={addNewColumn}
                 variant="contained" color="success" size="small"
@@ -131,7 +136,6 @@ function ListColumns({ columns, createNewColumn, createNewCard }) {
             </Box>
           </Box>
         }
-
       </Box>
     </SortableContext>
   )
