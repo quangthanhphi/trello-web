@@ -14,6 +14,9 @@ Deployed the web application to Vercel and Render for live access and testing.
 -   @dnd-kit/utilities": "^3.2.1", ...
 -   node v18.16.0
 
+# Deploy link:
+https://trello-web-pqt.vercel.app/
+
   
 ## Screenshots
 ![Website Overview](images/image1.png)
